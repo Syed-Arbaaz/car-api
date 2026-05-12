@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+
+  mysql-db:
+    image: mysql:8
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: carsdb
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppass
+    ports:
+      - "3306:3306"
+    networks:
+      - car-network
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  car-api:
+    build: .
+    container_name: car-api
+    restart: always
+    depends_on:
+      - mysql-db
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/carsdb
+      SPRING_DATASOURCE_USERNAME: appuser
+      SPRING_DATASOURCE_PASSWORD: apppass
+    networks:
+      - car-network
+
+networks:
+  car-network:
+
+volumes:
+  mysql_data:
