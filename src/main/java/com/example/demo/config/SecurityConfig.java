@@ -22,7 +22,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
     http
         .csrf(csrf -> csrf.disable())
 
-        .authorizeHttpRequests(auth -> auth
+       /* .authorizeHttpRequests(auth -> auth
 
              .requestMatchers(
                 "/auth/**",
@@ -31,23 +31,16 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
                 "/swagger-ui.html"
             ).permitAll()
 
-            .requestMatchers(
-                    "/auth/register",
-                    "/auth/login",
-                    "/auth/refresh"
-            ).permitAll()
+             */
 
-           
+            .authorizeHttpRequests(auth -> auth
+    .requestMatchers("/auth/**").permitAll()
 
-            .requestMatchers("/cars")
-            .hasAnyRole("USER", "ADMIN")
+    .requestMatchers("/cars/**").hasAnyRole("USER", "ADMIN")
+    .requestMatchers("/car/**").hasRole("ADMIN")
 
-            .requestMatchers("/car/**")
-            .hasRole("ADMIN")
-
-            .anyRequest()
-            .authenticated()
-        )
+    .anyRequest().authenticated()
+)
 
         .addFilterBefore(
                 jwtFilter,
