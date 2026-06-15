@@ -40,32 +40,35 @@ if(path.equals("/auth/login") ||
 }
                 
             String authHeader = request.getHeader("Authorization");
+            System.out.println("AUTH HEADER: " + authHeader);
 
             if(authHeader!=null && authHeader.startsWith("Bearer ")){
                 String token = authHeader.substring(7);
                 try{
                         String username = jwtService.extractUsername(token);
 
-String role = jwtService.extractRole(token);
+                String role = jwtService.extractRole(token);
+                System.out.println("TOKEN: " + token);
 
-List<SimpleGrantedAuthority> authorities =
+        List<SimpleGrantedAuthority> authorities =
         List.of(
                 new SimpleGrantedAuthority(
                         "ROLE_" + role
                 )
         );
 
-UsernamePasswordAuthenticationToken authToken =
+        UsernamePasswordAuthenticationToken authToken =
         new UsernamePasswordAuthenticationToken(
                 username,
                 null,
                 authorities
         );
 
-SecurityContextHolder.getContext()
+        SecurityContextHolder.getContext()
         .setAuthentication(authToken);
+        System.out.println("AUTHENTICATION SET");
 
-logger.info("User logged in: {}", username);
+        logger.info("User logged in: {}", username);
                    }
                 catch(Exception e){
                         e.printStackTrace();
@@ -78,12 +81,13 @@ logger.info("User logged in: {}", username);
         }  
 
         @Override
-protected boolean shouldNotFilter(HttpServletRequest request) {
+        protected boolean shouldNotFilter(HttpServletRequest request) {
 
-    String path = request.getServletPath();
+        String path = request.getServletPath();
 
-    return path.startsWith("/swagger-ui")
+         return path.startsWith("/swagger-ui")
             || path.startsWith("/v3/api-docs")
-            || path.startsWith("/auth");
+            || path.startsWith("/auth")
+            || path.startsWith("/uploads");
         }
 }

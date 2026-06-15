@@ -12,15 +12,30 @@ import lombok.Setter;
 @AllArgsConstructor
 public class RegisterRequest {
 
-    @NotBlank(message = "Username is required")
-    @Size(min = 3, max = 20, message = "Username must be 3-20 characters")
-    private String username;
+   @NotBlank
+private String firstName;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters")
+@NotBlank
+private String lastName;
+
+@Email
+@NotBlank
+private String email;
+
+@Pattern(
+    regexp = "^[0-9]{10}$",
+    message = "Phone number must be 10 digits"
+)
+private String phone;
+
+@Pattern(
+    regexp =
+    "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$",
+    message =
+    "Password must contain uppercase, lowercase and number"
+)
     private String password;
 
-    @NotBlank(message = "Role is required")
     private String role;
 
     // getters & setters

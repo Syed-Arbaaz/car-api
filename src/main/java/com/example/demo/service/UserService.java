@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -7,8 +9,11 @@ import org.springframework.stereotype.Service;
 import com.example.demo.dto.AuthResponseDTO;
 import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.RefreshTokenRequest;
+import com.example.demo.dto.RegisterRequest;
 import com.example.demo.model.User;
+import com.example.demo.model.VerificationToken;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.VerificationTokenRepository;
 
 @Service
 public class UserService {
@@ -22,28 +27,88 @@ public class UserService {
     @Autowired
     private JwtService jwtService;
 
-    public User registerUser(User user){
+    @Autowired
+    private VerificationTokenRepository verificationTokenRepository;
 
-    user.setPassword(
-            passwordEncoder.encode(user.getPassword())
-    );
+    @Autowired
+    private EmailService emailService;
 
-    if(user.getRole() == null || user.getRole().isEmpty()){
-        user.setRole("USER");
+   public User register(RegisterRequest request){
+
+    if(repo.existsByEmail(request.getEmail())){
+        throw new RuntimeException("Email already exists");
     }
 
-    return repo.save(user);
+    User user = new User();
+
+    user.setFirstName(request.getFirstName());
+    user.setLastName(request.getLastName());
+    user.setPhone(request.getPhone());
+    user.setEmail(request.getEmail());
+
+    user.setPassword(
+            passwordEncoder.encode(request.getPassword())
+    );
+
+    user.setRole("USER");
+    user.setVerified(false);
+
+    if(request.getRole() == null || request.getRole().isEmpty()){
+        user.setRole("USER");
+    } else {
+        user.setRole(request.getRole());
+    }
+
+    User savedUser = repo.save(user);
+    String token = UUID.randomUUID().toString();
+
+    VerificationToken verificationToken = new VerificationToken();
+
+    verificationToken.setToken(token);
+    verificationToken.setUserId(savedUser.getId());
+    verificationTokenRepository.save(verificationToken);
+    
+    String verificationLink =
+        "http://localhost:8080/auth/verify?token="
+        + token;
+
+        emailService.sendVerificationEmail(savedUser.getEmail(), verificationLink);
+        return savedUser;
+}
+
+public String verifyEmail(String token){
+    VerificationToken verificationToken = 
+    verificationTokenRepository.findByToken(token).
+        orElseThrow(()-> new RuntimeException ("Invalid Token"));
+
+        User user = repo.findById(verificationToken.getUserId()).
+        orElseThrow(()-> new RuntimeException("User not found"));
+
+        if (user.getVerified()) {
+        return "Already verified";
+        }
+
+        user.setVerified(true);
+        repo.save(user);
+        verificationTokenRepository.delete(verificationToken);
+        return "Email verified Successfully";
 }
 
     public AuthResponseDTO login(LoginRequest request){
-            User user = repo.findByUsername(request.getUsername()).orElseThrow(()-> new RuntimeException("User Not found"));
+            User user = repo.findByEmail(request.getEmail()).orElseThrow(()-> new RuntimeException("User Not found"));
             boolean matches = passwordEncoder.matches(request.getPassword(), user.getPassword());
+            
+            if (!user.getVerified()) {
+            throw new RuntimeException(
+            "Please verify your email first"
+            );
+                }
             if(!matches){
                 throw new RuntimeException( "invalid passsword");
             }
-            String accessToken = jwtService.generateAccessToken(user.getUsername(), user.getRole());
+            String accessToken = jwtService.generateAccessToken(user.getEmail(), user.getRole());
 
-            String refreshToken = jwtService.generateRefreshToken(user.getUsername());
+            String refreshToken = jwtService.generateRefreshToken(user.getEmail());
             
             return new AuthResponseDTO(accessToken, refreshToken);
     }
@@ -57,10 +122,10 @@ public class UserService {
 
         String username = jwtService.extractUsername(refreshToken);
 
-        User user = repo.findByUsername(username)
+        User user = repo.findByEmail(username)
         .orElseThrow(()-> new RuntimeException("User not found"));
 
-        String newAccessToken = jwtService.generateAccessToken(user.getUsername(), user.getRole());
+        String newAccessToken = jwtService.generateAccessToken(user.getEmail(), user.getRole());
         
         return new AuthResponseDTO(newAccessToken, refreshToken);
     }

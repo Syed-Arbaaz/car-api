@@ -10,6 +10,7 @@ public class CarMapper {
         Car car = new Car();
         car.setName(dto.getName());
         car.setBrand(dto.getBrand());
+        car.setPrice(dto.getPrice());
 
         return car;
     }
@@ -19,6 +20,8 @@ public class CarMapper {
         dto.setId(car.getId());
         dto.setName(car.getName());
         dto.setBrand(car.getBrand());
+        dto.setPrice(car.getPrice());
+        dto.setImageUrl(car.getImageUrl());
         return dto;
     }
 }

@@ -17,6 +17,8 @@ public interface CarService {
 
     List<CarResponseDTO> getCarsByBrand(String brand);
 
+    CarResponseDTO updateCar(int id, CarRequestDTO dto);
+
     void deleteCar(int id);
 }
 
