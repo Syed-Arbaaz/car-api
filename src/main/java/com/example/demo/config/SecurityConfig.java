@@ -24,6 +24,8 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
     http
         .cors(cors ->{})
         .csrf(csrf -> csrf.disable())
+        .httpBasic(httpBasic -> httpBasic.disable())
+        .formLogin(form -> form.disable())
 
         .sessionManagement(session ->
         session.sessionCreationPolicy(
@@ -32,6 +34,10 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         )
 
         .authorizeHttpRequests(auth -> auth
+
+        // Allow browser CORS preflight
+    .requestMatchers(HttpMethod.OPTIONS, "/**")
+        .permitAll()
 
     // public auth APIs
     .requestMatchers("/auth/**")
