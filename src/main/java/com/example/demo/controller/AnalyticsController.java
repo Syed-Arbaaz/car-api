@@ -11,7 +11,7 @@ import com.example.demo.service.AnalyticsService;
 
 @RestController
 @RequestMapping("/analytics")
-@CrossOrigin("*")
+//@CrossOrigin("*")
 public class AnalyticsController {
     
     @Autowired

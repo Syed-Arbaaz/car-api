@@ -28,7 +28,7 @@ import com.example.demo.service.invoice.InvoiceService;
 
 @RestController
 @RequestMapping("/bookings")
-@CrossOrigin("*")
+//@CrossOrigin("*")
 public class BookingController {
 
     
