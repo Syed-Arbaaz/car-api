@@ -73,7 +73,7 @@ public class UserService {
     verificationTokenRepository.save(verificationToken);
     
     String verificationLink =
-        baseUrl + "/auth/verify?token="
+        baseUrl + "/api/auth/verify?token="
         + token;
 
         emailService.sendVerificationEmail(savedUser.getEmail(), verificationLink);
