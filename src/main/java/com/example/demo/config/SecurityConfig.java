@@ -46,6 +46,8 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         .requestMatchers("/uploads/**")
         .permitAll()
 
+        .requestMatchers("/api/uploads/**").permitAll()
+
        
 
     // everyone can view cars

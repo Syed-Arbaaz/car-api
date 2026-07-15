@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,9 @@ public class CarServiceImpl implements CarService {
     @Autowired
     private CarRepository repo;
 
+
+    @Value("${app.base-url}")
+    private String baseUrl;
     
         @Override
 public CarResponseDTO addCar(CarRequestDTO dto) {
@@ -68,7 +72,7 @@ public CarResponseDTO addCar(CarRequestDTO dto) {
         Car car =
             CarMapper.toEntity(dto);
 
-        car.setImageUrl("/api/uploads/" + fileName);
+        car.setImageUrl(baseUrl +"/api/uploads/" + fileName);
 
         return CarMapper.toDTO(
             repo.save(car)
@@ -160,7 +164,7 @@ public CarResponseDTO getCarById(int id) {
     car.setName(dto.getName());
     car.setBrand(dto.getBrand());
     car.setPrice(dto.getPrice());
-    car.setImageUrl("/api/uploads/" + fileName);
+    car.setImageUrl(baseUrl + "/api/uploads/" + fileName);
 
     Car updated = repo.save(car);
 

@@ -18,7 +18,7 @@ implements WebMvcConfigurer {
                 "/uploads/**"
             )
             .addResourceLocations(
-                "file:/uploads/"
+                "file:uploads/"
             );
     }
 }
