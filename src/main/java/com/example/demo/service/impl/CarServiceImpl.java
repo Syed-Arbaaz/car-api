@@ -68,7 +68,7 @@ public CarResponseDTO addCar(CarRequestDTO dto) {
         Car car =
             CarMapper.toEntity(dto);
 
-        car.setImageUrl("http://localhost:8080/uploads/" + fileName);
+        car.setImageUrl("/api/uploads/" + fileName);
 
         return CarMapper.toDTO(
             repo.save(car)
@@ -160,7 +160,7 @@ public CarResponseDTO getCarById(int id) {
     car.setName(dto.getName());
     car.setBrand(dto.getBrand());
     car.setPrice(dto.getPrice());
-    car.setImageUrl("/uploads/" + fileName);
+    car.setImageUrl("/api/uploads/" + fileName);
 
     Car updated = repo.save(car);
 
