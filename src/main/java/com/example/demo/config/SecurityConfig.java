@@ -87,6 +87,11 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
     .requestMatchers("/analytics/**")
     .hasRole("ADMIN")
 
+
+    //Springboot Actuator or metrics
+    .requestMatchers("/actuator/**")
+    .permitAll()
+
     .anyRequest().authenticated()
 )
 
